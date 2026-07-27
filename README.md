@@ -1,37 +1,38 @@
-# Nat-ur PWA V2
+# Nat-ur PWA – version 3.0.0
 
-En meget enkel naturs-app med:
+GitHub-klar PWA med:
 
-- Stort digitalt ur
-- Lysstyrke fra 1–25 % inde i appen
-- Valgfri dato og sekunder
-- Screen Wake Lock, hvor browseren understøtter det
-- Enkel alarm og vibration
-- Offline-cache og PWA-manifest
+- Stort, køligt blåt ur
+- Lidt kraftigere typografi
+- Ingen dato
+- Valgfrie sekunder
+- Dæmpet, synligt tandhjul
+- Justerbar lysstyrke
+- Wake Lock-status kun i menuen
+- Alarm og justerbar alarmlydstyrke
+- Sort tema og sort Android-systemnavigation, hvor browseren tillader det
+- Automatisk opdatering, når en ny version uploades
 
-## Installation
+## Upload til GitHub Pages
 
-Upload hele mappen til en HTTPS-host, fx Cloudflare Pages eller GitHub Pages.
-Åbn siden i Chrome på Android og vælg **Føj til startskærm** eller **Installer app**.
+Upload filerne i denne mappe til roden af dit repository.
+
+GitHub Pages skal være aktiveret under:
+
+`Settings → Pages → Deploy from a branch`
+
+## Nye versioner
+
+Når du laver en ny version, skal versionsnummeret ændres både i:
+
+- `app.js`
+- `sw.js`
+- teksten nederst i `index.html`
+
+Det sikrer, at installerede PWA'er opdager og henter den nye version.
 
 ## Begrænsninger
 
-En almindelig PWA kan ikke styre telefonens fysiske systemlysstyrke.
-Alarmen kan heller ikke garanteres, hvis browseren eller appen er lukket af Android.
-Brug derfor telefonens normale alarm som backup, hvis det er vigtigt at vågne.
+Wake Lock virker kun, mens appen er åben og synlig. Android kan stadig afbryde funktionen ved ekstrem batterisparetilstand eller hvis appen tvangslukkes.
 
-
-## V2
-
-- Uret fylder langt mere af skærmen i både stående og liggende format.
-- Tallene er ændret til en meget afdæmpet, kølig blå.
-- Appen kontrollerer efter en ny service worker ved hver opstart, når appen åbnes igen og hver 30. minut.
-- HTML hentes netværk-først, så en ny GitHub Pages-udgave ikke bliver låst fast bag den gamle cache.
-- Ved fremtidige releases skal `VERSION` øges i `sw.js`, fx fra `2.0.0` til `2.0.1`.
-
-
-## V2.1.0
-- Højere standardlysstyrke
-- Lysstyrkemenu fra 5–60 %
-- Always-on er permanent og genaktiveres automatisk
-- Synlig status for Wake Lock
+Systemnavigationens farve styres af Android og Chrome. PWA'en anmoder om sort navigation via sort tema, baggrund og standalone-visning, men enkelte Android-versioner kan stadig bruge deres egen kontrastfarve.

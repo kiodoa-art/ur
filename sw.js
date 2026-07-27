@@ -1,66 +1,64 @@
-const VERSION = "2.1.0";
-const CACHE = `nat-ur-v${VERSION}`;
+const VERSION = "3.0.0";
+const STATIC_CACHE = `nat-ur-static-${VERSION}`;
 const APP_SHELL = [
+  "./",
+  "./index.html",
   "./style.css",
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon.svg"
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(APP_SHELL))
+  );
   self.skipWaiting();
 });
 
-self.addEventListener("activate", event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))
-    )
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys
+          .filter((key) => key.startsWith("nat-ur-") && key !== STATIC_CACHE)
+          .map((key) => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener("message", event => {
-  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener("fetch", (event) => {
   const request = event.request;
-  if (request.method !== "GET") return;
 
-  const url = new URL(request.url);
-
-  // Navigation skal altid forsøge at hente den nyeste GitHub-version først.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request, { cache: "no-store" })
-        .then(response => {
+        .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put("./index.html", copy));
+          caches.open(STATIC_CACHE).then((cache) => cache.put("./index.html", copy));
           return response;
         })
-        .catch(() => caches.match("./index.html").then(r => r || caches.match("./")))
+        .catch(() => caches.match("./index.html"))
     );
     return;
   }
 
-  // Lokale filer opdateres i baggrunden, men virker stadig offline.
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request).then(cached => {
-        const fresh = fetch(request, { cache: "no-store" })
-          .then(response => {
-            if (response.ok) {
-              const copy = response.clone();
-              caches.open(CACHE).then(cache => cache.put(request, copy));
-            }
-            return response;
-          })
-          .catch(() => cached);
-
-        return cached || fresh;
+  event.respondWith(
+    fetch(request, { cache: "no-store" })
+      .then((response) => {
+        if (response.ok && request.method === "GET") {
+          const copy = response.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+        }
+        return response;
       })
-    );
-  }
+      .catch(() => caches.match(request))
+  );
 });
