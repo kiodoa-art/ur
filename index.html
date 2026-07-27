@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <title>Nat-ur V2</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="clock-wrap" aria-label="Ur">
+      <div id="clock" class="clock">00:00</div>
+      <div id="date" class="date"></div>
+      <div id="alarmStatus" class="alarm-status"></div>
+    </section>
+
+    <button id="openControls" class="corner-button" aria-label="Åbn indstillinger">⋯</button>
+
+    <section id="controls" class="controls" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h1>Nat-ur</h1>
+          <button id="closeControls" class="icon-button" aria-label="Luk">×</button>
+        </div>
+
+        <label class="field">
+          <span>Lysstyrke</span>
+          <input id="brightness" type="range" min="1" max="25" value="6" />
+          <output id="brightnessValue">6 %</output>
+        </label>
+
+        <label class="toggle-row">
+          <span>Vis sekunder</span>
+          <input id="showSeconds" type="checkbox" />
+        </label>
+
+        <label class="toggle-row">
+          <span>Vis dato</span>
+          <input id="showDate" type="checkbox" checked />
+        </label>
+
+        <label class="toggle-row">
+          <span>Hold skærmen vågen</span>
+          <input id="keepAwake" type="checkbox" checked />
+        </label>
+
+        <hr />
+
+        <div class="alarm-grid">
+          <label class="field">
+            <span>Alarm</span>
+            <input id="alarmTime" type="time" />
+          </label>
+          <label class="toggle-row">
+            <span>Aktiv</span>
+            <input id="alarmEnabled" type="checkbox" />
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Lydstyrke</span>
+          <input id="alarmVolume" type="range" min="5" max="100" value="60" />
+          <output id="volumeValue">60 %</output>
+        </label>
+
+        <div class="button-row">
+          <button id="testAlarm" class="secondary">Test alarm</button>
+          <button id="stopAlarm" class="danger" hidden>Stop alarm</button>
+        </div>
+
+        <p class="note">
+          PWA'en kan dæmpe selve urskærmen, men den kan ikke ændre telefonens systemlysstyrke.
+          Alarmen kræver, at appen er åben.
+        </p>
+      </div>
+    </section>
+
+    <div id="dimmer" class="dimmer" aria-hidden="true"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
