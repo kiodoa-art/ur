@@ -1,11 +1,10 @@
-# Nat-ur PWA 3.1.0
+# Nat-ur PWA 4.0.0
 
-Denne version er bygget om fra bunden. CSS og JavaScript ligger i samme index.html, så browseren ikke kan blande filer fra forskellige versioner.
+Nyheder:
 
-- Menuen er testet til at åbne, lukke og gemme indstillinger.
-- Wake Lock-status vises kun i menuen.
-- Installeret visning er sat til fullscreen for at fjerne Androids hvide navigationsbjælke.
-- Uret bruger telefonens lokale systemtid og virker offline.
-- Service workeren cacher kun den samlede index.html som offline-reserve.
+- Slider til at ændre urets størrelse fra 60 % til 135 %
+- Valgt størrelse gemmes lokalt
+- Pinch-zoom og brugerzoom er deaktiveret
+- Bygger videre på den stabile V3.1.0 med samlet HTML/CSS/JavaScript
 
-Upload alle filer til roden af GitHub-repositoriet. Da manifestets visning er ændret til fullscreen, bør den eksisterende PWA afinstalleres og installeres igen én gang.
+Upload alle filer til roden af GitHub-repositoriet og overskriv de gamle filer.

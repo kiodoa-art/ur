@@ -2,25 +2,25 @@
 <html lang="da">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#000000">
   <meta name="color-scheme" content="dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <title>Nat-ur</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=3.1.0">
-  <link rel="icon" href="./icons/icon.svg?v=3.1.0" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest?v=4.0.0">
+  <link rel="icon" href="./icons/icon.svg?v=4.0.0" type="image/svg+xml">
   <style>
     *{box-sizing:border-box}
     :root{color-scheme:dark;--clock-alpha:.34;--blue:132,174,255;--line:rgba(148,163,184,.17)}
     html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#000!important;overscroll-behavior:none}
-    body{min-height:100dvh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f7fb;-webkit-tap-highlight-color:transparent}
+    body{min-height:100dvh;touch-action:manipulation;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f7fb;-webkit-tap-highlight-color:transparent}
     button,input{font:inherit}
     button{color:inherit}
     [hidden]{display:none!important}
     .app{position:relative;width:100%;height:100dvh;background:#000}
-    .clock-screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:rgba(var(--blue),var(--clock-alpha));text-align:center}
+    .clock-screen{width:100%;height:100%;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:rgba(var(--blue),var(--clock-alpha));text-align:center}
     .clock{font-size:clamp(7rem,31vw,23rem);line-height:.82;font-weight:520;letter-spacing:-.065em;font-variant-numeric:tabular-nums;white-space:nowrap}
     .seconds{margin-top:clamp(1rem,3vh,2.5rem);font-size:clamp(2rem,8vw,5.5rem);font-weight:500;color:rgba(var(--blue),calc(var(--clock-alpha)*.88));font-variant-numeric:tabular-nums}
     .settings-button{position:fixed;z-index:20;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));width:56px;height:56px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(132,174,255,.035);color:rgb(var(--blue));opacity:.42;cursor:pointer;touch-action:manipulation}
@@ -84,6 +84,11 @@
           <input id="brightness" type="range" min="8" max="70" value="34">
         </section>
 
+        <section class="section">
+          <div class="label-row"><label for="clockSize">Urets størrelse</label><output id="clockSizeValue">100 %</output></div>
+          <input id="clockSize" type="range" min="60" max="135" step="1" value="100">
+        </section>
+
         <section class="section compact">
           <label class="toggle-row"><span>Vis sekunder</span><input id="showSeconds" type="checkbox"><span class="toggle-ui" aria-hidden="true"></span></label>
         </section>
@@ -104,7 +109,7 @@
           <button id="testAlarm" class="action-button" type="button">▶&nbsp;&nbsp; Test alarm</button>
           <button id="stopAlarm" class="action-button stop" type="button" hidden>Stop alarm</button>
         </section>
-        <footer>Version 3.1.0</footer>
+        <footer>Version 4.0.0</footer>
       </div>
     </section>
   </main>
@@ -112,16 +117,16 @@
   <script>
   (()=>{
     'use strict';
-    const VERSION='3.1.0';
+    const VERSION='4.0.0';
     const $=id=>document.getElementById(id);
-    const el={clock:$('clock'),seconds:$('seconds'),settingsButton:$('settingsButton'),overlay:$('settingsOverlay'),closeSettings:$('closeSettings'),brightness:$('brightness'),brightnessValue:$('brightnessValue'),showSeconds:$('showSeconds'),wakeDot:$('wakeDot'),wakeText:$('wakeText'),alarmTime:$('alarmTime'),alarmEnabled:$('alarmEnabled'),alarmVolume:$('alarmVolume'),alarmVolumeValue:$('alarmVolumeValue'),testAlarm:$('testAlarm'),stopAlarm:$('stopAlarm')};
-    const defaults={brightness:34,showSeconds:false,alarmTime:'07:00',alarmEnabled:false,alarmVolume:60};
+    const el={clock:$('clock'),seconds:$('seconds'),settingsButton:$('settingsButton'),overlay:$('settingsOverlay'),closeSettings:$('closeSettings'),brightness:$('brightness'),brightnessValue:$('brightnessValue'),clockSize:$('clockSize'),clockSizeValue:$('clockSizeValue'),showSeconds:$('showSeconds'),wakeDot:$('wakeDot'),wakeText:$('wakeText'),alarmTime:$('alarmTime'),alarmEnabled:$('alarmEnabled'),alarmVolume:$('alarmVolume'),alarmVolumeValue:$('alarmVolumeValue'),testAlarm:$('testAlarm'),stopAlarm:$('stopAlarm')};
+    const defaults={brightness:34,clockSize:100,showSeconds:false,alarmTime:'07:00',alarmEnabled:false,alarmVolume:60};
     let wakeLock=null,wakeRetry=null,audioContext=null,oscillator=null,gainNode=null,toneTimer=null,lastAlarmKey='',reloading=false;
 
     function settings(){try{return {...defaults,...JSON.parse(localStorage.getItem('natUrSettings')||'{}')}}catch{return {...defaults}}}
-    function apply(){const value=Number(el.brightness.value)||defaults.brightness;document.documentElement.style.setProperty('--clock-alpha',String(value/100));el.brightnessValue.textContent=`${value} %`;el.alarmVolumeValue.textContent=`${el.alarmVolume.value} %`;el.seconds.hidden=!el.showSeconds.checked}
-    function save(){localStorage.setItem('natUrSettings',JSON.stringify({brightness:Number(el.brightness.value),showSeconds:el.showSeconds.checked,alarmTime:el.alarmTime.value||defaults.alarmTime,alarmEnabled:el.alarmEnabled.checked,alarmVolume:Number(el.alarmVolume.value)}));apply()}
-    function load(){const s=settings();el.brightness.value=s.brightness;el.showSeconds.checked=Boolean(s.showSeconds);el.alarmTime.value=s.alarmTime||defaults.alarmTime;el.alarmEnabled.checked=Boolean(s.alarmEnabled);el.alarmVolume.value=s.alarmVolume;apply()}
+    function applyClockSize(){const value=Number(el.clockSize.value)||defaults.clockSize,scale=value/100,landscape=matchMedia('(orientation: landscape)').matches;el.clock.style.fontSize=landscape?`min(${48*scale}vh,${31*scale}vw)`:`clamp(${5*scale}rem,${31*scale}vw,${23*scale}rem)`;el.clockSizeValue.textContent=`${value} %`}function apply(){const value=Number(el.brightness.value)||defaults.brightness;document.documentElement.style.setProperty('--clock-alpha',String(value/100));el.brightnessValue.textContent=`${value} %`;el.alarmVolumeValue.textContent=`${el.alarmVolume.value} %`;el.seconds.hidden=!el.showSeconds.checked;applyClockSize()}
+    function save(){localStorage.setItem('natUrSettings',JSON.stringify({brightness:Number(el.brightness.value),clockSize:Number(el.clockSize.value),showSeconds:el.showSeconds.checked,alarmTime:el.alarmTime.value||defaults.alarmTime,alarmEnabled:el.alarmEnabled.checked,alarmVolume:Number(el.alarmVolume.value)}));apply()}
+    function load(){const s=settings();el.brightness.value=s.brightness;el.clockSize.value=s.clockSize||defaults.clockSize;el.showSeconds.checked=Boolean(s.showSeconds);el.alarmTime.value=s.alarmTime||defaults.alarmTime;el.alarmEnabled.checked=Boolean(s.alarmEnabled);el.alarmVolume.value=s.alarmVolume;apply()}
     function tick(){const now=new Date(),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),ss=String(now.getSeconds()).padStart(2,'0');el.clock.textContent=`${hh}:${mm}`;el.seconds.textContent=ss;checkAlarm(now,`${hh}:${mm}`)}
     function wakeStatus(state,text){el.wakeDot.className=`status-dot ${state}`;el.wakeText.textContent=text}
     async function requestWakeLock(){clearTimeout(wakeRetry);if(!('wakeLock'in navigator)){wakeStatus('error','Wake Lock understøttes ikke');return}if(document.visibilityState!=='visible'){wakeStatus('waiting','Venter på at appen bliver aktiv');return}if(wakeLock&&!wakeLock.released){wakeStatus('active','Skærmen holdes vågen');return}wakeStatus('waiting','Aktiverer Wake Lock…');try{wakeLock=await navigator.wakeLock.request('screen');wakeStatus('active','Skærmen holdes vågen');wakeLock.addEventListener('release',()=>{wakeLock=null;if(document.visibilityState==='visible'){wakeStatus('waiting','Genaktiverer Wake Lock…');wakeRetry=setTimeout(requestWakeLock,800)}},{once:true})}catch{wakeStatus('error','Wake Lock kunne ikke aktiveres');wakeRetry=setTimeout(requestWakeLock,3000)}}
@@ -131,9 +136,9 @@
     function openMenu(){el.overlay.hidden=false;el.closeSettings.focus();requestWakeLock()}
     function closeMenu(){el.overlay.hidden=true;el.settingsButton.focus()}
     async function enterFullscreen(){if(document.fullscreenElement||!document.documentElement.requestFullscreen)return;try{await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch{}}
-    function bind(){[el.brightness,el.showSeconds,el.alarmTime,el.alarmEnabled,el.alarmVolume].forEach(node=>{node.addEventListener('input',save);node.addEventListener('change',save)});el.settingsButton.addEventListener('click',()=>{openMenu();enterFullscreen()});el.closeSettings.addEventListener('click',closeMenu);el.overlay.addEventListener('click',e=>{if(e.target===el.overlay)closeMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!el.overlay.hidden)closeMenu()});el.testAlarm.addEventListener('click',startAlarm);el.stopAlarm.addEventListener('click',stopAlarm);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){tick();requestWakeLock();checkUpdates()}});document.addEventListener('pointerdown',requestWakeLock,{passive:true})}
+    function bind(){[el.brightness,el.clockSize,el.showSeconds,el.alarmTime,el.alarmEnabled,el.alarmVolume].forEach(node=>{node.addEventListener('input',save);node.addEventListener('change',save)});el.settingsButton.addEventListener('click',()=>{openMenu();enterFullscreen()});el.closeSettings.addEventListener('click',closeMenu);el.overlay.addEventListener('click',e=>{if(e.target===el.overlay)closeMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!el.overlay.hidden)closeMenu()});el.testAlarm.addEventListener('click',startAlarm);el.stopAlarm.addEventListener('click',stopAlarm);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){tick();requestWakeLock();checkUpdates()}});document.addEventListener('pointerdown',requestWakeLock,{passive:true});window.addEventListener('resize',applyClockSize)}
     async function checkUpdates(){if(!('serviceWorker'in navigator))return;try{const r=await navigator.serviceWorker.getRegistration();await r?.update()}catch{}}
-    function installSW(){if(!('serviceWorker'in navigator))return;window.addEventListener('load',async()=>{try{const r=await navigator.serviceWorker.register('./sw.js?v=3.1.0',{updateViaCache:'none'});r.addEventListener('updatefound',()=>{const w=r.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'})})});navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});setInterval(checkUpdates,30*60*1000)}catch{}})}
+    function installSW(){if(!('serviceWorker'in navigator))return;window.addEventListener('load',async()=>{try{const r=await navigator.serviceWorker.register('./sw.js?v=4.0.0',{updateViaCache:'none'});r.addEventListener('updatefound',()=>{const w=r.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'})})});navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});setInterval(checkUpdates,30*60*1000)}catch{}})}
     load();tick();bind();requestWakeLock();installSW();setInterval(tick,1000);
   })();
   </script>
