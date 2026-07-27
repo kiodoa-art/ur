@@ -2,23 +2,16 @@
   "id": "./",
   "name": "Nat-ur",
   "short_name": "Nat-ur",
-  "description": "Et enkelt og mørkt nat-ur med alarm.",
-  "start_url": "./",
+  "description": "Et enkelt, mørkt nat-ur med alarm.",
+  "start_url": "./?v=3.0.1",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "fullscreen"
-  ],
   "orientation": "any",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "categories": [
-    "utilities"
-  ],
   "icons": [
     {
-      "src": "icons/icon.svg",
+      "src": "./icons/icon.svg?v=3.0.1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

@@ -4,94 +4,80 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#000000">
-  <meta name="background-color" content="#000000">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <title>Nat-ur</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="./manifest.webmanifest?v=3.0.1">
+  <link rel="icon" href="./icons/icon.svg?v=3.0.1" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=3.0.1">
 </head>
 <body>
   <main class="app">
-    <section class="clock-screen" aria-label="Nat-ur">
-      <div id="clock" class="clock">00:00</div>
-      <div id="seconds" class="seconds" hidden>00</div>
+    <section class="clock-screen" aria-label="Ur">
+      <div id="clock" class="clock">--:--</div>
+      <div id="seconds" class="seconds" hidden>--</div>
     </section>
 
-    <button id="settingsButton" class="settings-button" type="button" aria-label="Åbn indstillinger">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4L10.7 6a8 8 0 0 0-1.7 1L6.6 6l-2 3.4L6.6 11a7.8 7.8 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.3 2.5h4l.3-2.5a8 8 0 0 0 1.7-1l2.4 1 2-3.4L19.4 13ZM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5Z"/>
-      </svg>
-    </button>
+    <button id="settingsButton" class="settings-button" type="button" aria-label="Åbn indstillinger">⚙</button>
 
-    <section id="settingsOverlay" class="settings-overlay" hidden>
-      <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-        <header class="settings-header">
+    <section id="settingsOverlay" class="overlay" hidden>
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="panel-header">
           <h1 id="settingsTitle">Indstillinger</h1>
-          <button id="closeSettings" class="close-button" type="button" aria-label="Luk indstillinger">×</button>
+          <button id="closeSettings" class="close-button" type="button" aria-label="Luk">×</button>
         </header>
 
-        <section class="setting-section">
-          <div class="setting-label-row">
-            <label for="clockBrightness">Lysstyrke</label>
-            <output id="clockBrightnessValue">28 %</output>
+        <section class="section first">
+          <div class="label-row">
+            <label for="brightness">Lysstyrke</label>
+            <output id="brightnessValue">28 %</output>
           </div>
-          <input id="clockBrightness" type="range" min="8" max="70" step="1" value="28">
+          <input id="brightness" type="range" min="8" max="70" value="28">
         </section>
 
-        <section class="setting-section compact">
-          <label class="switch-row" for="showSeconds">
+        <section class="section compact">
+          <label class="toggle-row">
             <span>Vis sekunder</span>
             <input id="showSeconds" type="checkbox">
-            <span class="switch" aria-hidden="true"></span>
+            <span class="toggle-ui"></span>
           </label>
         </section>
 
-        <section class="setting-section">
+        <section class="section">
           <h2>Status</h2>
           <div class="status-row">
-            <span id="wakeLockDot" class="status-dot waiting"></span>
-            <span id="wakeLockText">Starter…</span>
+            <span id="wakeDot" class="status-dot waiting"></span>
+            <span id="wakeText">Aktiverer Wake Lock…</span>
           </div>
         </section>
 
-        <section class="setting-section">
+        <section class="section">
           <h2>Alarm</h2>
-
           <div class="alarm-row">
-            <label class="time-field" for="alarmTime">
-              <span class="sr-only">Alarmtid</span>
-              <input id="alarmTime" type="time" value="07:00">
-            </label>
-
-            <label class="switch-row inline" for="alarmEnabled">
+            <input id="alarmTime" type="time" value="07:00" aria-label="Alarmtid">
+            <label class="toggle-row alarm-toggle">
               <span>Aktiv</span>
               <input id="alarmEnabled" type="checkbox">
-              <span class="switch" aria-hidden="true"></span>
+              <span class="toggle-ui"></span>
             </label>
           </div>
 
-          <div class="setting-label-row alarm-volume-label">
+          <div class="label-row volume-label">
             <label for="alarmVolume">Lydstyrke</label>
             <output id="alarmVolumeValue">60 %</output>
           </div>
-          <input id="alarmVolume" type="range" min="5" max="100" step="1" value="60">
+          <input id="alarmVolume" type="range" min="5" max="100" value="60">
 
-          <button id="testAlarm" class="test-button" type="button">
-            <span class="play-icon">▶</span>
-            <span>Test alarm</span>
-          </button>
-
-          <button id="stopAlarm" class="stop-button" type="button" hidden>Stop alarm</button>
+          <button id="testAlarm" class="action-button" type="button">▶&nbsp;&nbsp; Test alarm</button>
+          <button id="stopAlarm" class="action-button stop" type="button" hidden>Stop alarm</button>
         </section>
 
-        <footer class="settings-footer">Version 3.0.0</footer>
+        <footer>Version 3.0.1</footer>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="./app.js?v=3.0.1"></script>
 </body>
 </html>
