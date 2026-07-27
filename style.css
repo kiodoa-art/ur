@@ -2,7 +2,7 @@
 
 :root {
   color-scheme: dark;
-  --clock-opacity: .06;
+  --clock-opacity: .20;
   --clock-rgb: 118, 178, 210;
 }
 
@@ -65,9 +65,9 @@ button, input { font: inherit; }
   height: 48px;
   border: 0;
   border-radius: 50%;
-  background: transparent;
-  color: rgba(255,255,255,.13);
-  font-size: 2rem;
+  background: rgba(8, 20, 27, .35);
+  color: rgba(140, 205, 235, .38);
+  font-size: 1.45rem;
 }
 
 .controls {
@@ -130,6 +130,31 @@ button, input { font: inherit; }
   background: #111;
   color: #fff;
 }
+
+
+.brightness-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  color: #777;
+  font-size: .75rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.wake-status {
+  color: #7fb8cf;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.wake-status.failed { color: #c69a70; }
 
 .toggle-row { margin-top: 20px; }
 .toggle-row input { width: 22px; height: 22px; }

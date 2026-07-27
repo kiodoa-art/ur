@@ -28,3 +28,10 @@ Brug derfor telefonens normale alarm som backup, hvis det er vigtigt at vågne.
 - Appen kontrollerer efter en ny service worker ved hver opstart, når appen åbnes igen og hver 30. minut.
 - HTML hentes netværk-først, så en ny GitHub Pages-udgave ikke bliver låst fast bag den gamle cache.
 - Ved fremtidige releases skal `VERSION` øges i `sw.js`, fx fra `2.0.0` til `2.0.1`.
+
+
+## V2.1.0
+- Højere standardlysstyrke
+- Lysstyrkemenu fra 5–60 %
+- Always-on er permanent og genaktiveres automatisk
+- Synlig status for Wake Lock

@@ -8,7 +8,7 @@ const brightness = $("brightness");
 const brightnessValue = $("brightnessValue");
 const showSeconds = $("showSeconds");
 const showDate = $("showDate");
-const keepAwake = $("keepAwake");
+const wakeStatus = $("wakeStatus");
 const alarmTime = $("alarmTime");
 const alarmEnabled = $("alarmEnabled");
 const alarmVolume = $("alarmVolume");
@@ -23,23 +23,21 @@ let alarmTimer = null;
 let lastAlarmKey = "";
 
 const defaults = {
-  brightness: 6,
+  brightness: 20,
   showSeconds: false,
   showDate: true,
-  keepAwake: true,
   alarmTime: "07:00",
   alarmEnabled: false,
   alarmVolume: 60
 };
 
 function loadSettings() {
-  const saved = JSON.parse(localStorage.getItem("natUrSettings") || "{}");
+  const saved = JSON.parse(localStorage.getItem("natUrSettingsV21") || "{}");
   const settings = { ...defaults, ...saved };
 
   brightness.value = settings.brightness;
   showSeconds.checked = settings.showSeconds;
   showDate.checked = settings.showDate;
-  keepAwake.checked = settings.keepAwake;
   alarmTime.value = settings.alarmTime;
   alarmEnabled.checked = settings.alarmEnabled;
   alarmVolume.value = settings.alarmVolume;
@@ -47,11 +45,10 @@ function loadSettings() {
 }
 
 function saveSettings() {
-  localStorage.setItem("natUrSettings", JSON.stringify({
+  localStorage.setItem("natUrSettingsV21", JSON.stringify({
     brightness: Number(brightness.value),
     showSeconds: showSeconds.checked,
     showDate: showDate.checked,
-    keepAwake: keepAwake.checked,
     alarmTime: alarmTime.value,
     alarmEnabled: alarmEnabled.checked,
     alarmVolume: Number(alarmVolume.value)
@@ -61,7 +58,7 @@ function saveSettings() {
 
 function applySettings() {
   const level = Number(brightness.value);
-  document.documentElement.style.setProperty("--clock-opacity", Math.max(.01, level / 100));
+  document.documentElement.style.setProperty("--clock-opacity", Math.max(.05, level / 100));
   brightnessValue.value = `${level} %`;
   volumeValue.value = `${alarmVolume.value} %`;
   dateEl.hidden = !showDate.checked;
@@ -70,8 +67,7 @@ function applySettings() {
     ? `Alarm ${alarmTime.value}`
     : "";
 
-  if (keepAwake.checked) requestWakeLock();
-  else releaseWakeLock();
+  requestWakeLock();
 }
 
 function updateClock() {
@@ -107,11 +103,31 @@ function checkAlarm(now) {
 }
 
 async function requestWakeLock() {
-  if (!("wakeLock" in navigator) || wakeLock) return;
+  if (!("wakeLock" in navigator)) {
+    wakeStatus.textContent = "Ikke understøttet";
+    wakeStatus.classList.add("failed");
+    return;
+  }
+
+  if (wakeLock) {
+    wakeStatus.textContent = "Aktiv";
+    wakeStatus.classList.remove("failed");
+    return;
+  }
+
   try {
     wakeLock = await navigator.wakeLock.request("screen");
-    wakeLock.addEventListener("release", () => wakeLock = null);
-  } catch (_) {}
+    wakeStatus.textContent = "Aktiv";
+    wakeStatus.classList.remove("failed");
+    wakeLock.addEventListener("release", () => {
+      wakeLock = null;
+      wakeStatus.textContent = "Genstarter…";
+      if (document.visibilityState === "visible") requestWakeLock();
+    });
+  } catch (_) {
+    wakeStatus.textContent = "Tryk på skærmen";
+    wakeStatus.classList.add("failed");
+  }
 }
 
 async function releaseWakeLock() {
@@ -170,7 +186,7 @@ controls.addEventListener("click", (event) => {
 });
 
 [
-  brightness, showSeconds, showDate, keepAwake,
+  brightness, showSeconds, showDate,
   alarmTime, alarmEnabled, alarmVolume
 ].forEach(el => el.addEventListener("input", saveSettings));
 
@@ -178,7 +194,11 @@ $("testAlarm").addEventListener("click", startAlarm);
 stopAlarmButton.addEventListener("click", stopAlarm);
 
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && keepAwake.checked) requestWakeLock();
+  if (document.visibilityState === "visible") requestWakeLock();
+});
+
+["click", "touchstart", "pointerdown"].forEach(eventName => {
+  document.addEventListener(eventName, requestWakeLock, { passive: true });
 });
 
 document.addEventListener("click", () => {
