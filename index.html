@@ -9,8 +9,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <title>Nat-ur</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=4.0.1">
-  <link rel="icon" href="./icons/icon.svg?v=4.0.1" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest?v=5.0.0">
+  <link rel="icon" href="./icons/icon.svg?v=5.0.0" type="image/svg+xml">
   <style>
     *{box-sizing:border-box}
     :root{color-scheme:dark;--clock-alpha:.34;--blue:132,174,255;--line:rgba(148,163,184,.17)}
@@ -23,7 +23,7 @@
     .clock-screen{width:100%;height:100%;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:rgba(var(--blue),var(--clock-alpha));text-align:center}
     .clock{font-size:clamp(7rem,31vw,23rem);line-height:.82;font-weight:520;letter-spacing:-.065em;font-variant-numeric:tabular-nums;white-space:nowrap}
     .seconds{margin-top:clamp(1rem,3vh,2.5rem);font-size:clamp(2rem,8vw,5.5rem);font-weight:500;color:rgba(var(--blue),calc(var(--clock-alpha)*.88));font-variant-numeric:tabular-nums}
-    .settings-button{position:fixed;z-index:20;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));width:56px;height:56px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(132,174,255,.035);color:rgb(var(--blue));opacity:.42;cursor:pointer;touch-action:manipulation}
+    .settings-button{position:fixed;z-index:20;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));width:56px;height:56px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(132,174,255,.035);color:rgb(var(--blue));opacity:var(--clock-alpha);cursor:pointer;touch-action:manipulation}
     .settings-button:active{opacity:.8;background:rgba(132,174,255,.1)}
     .settings-button svg{display:block;width:35px;height:35px;fill:currentColor;pointer-events:none}
     .overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:rgba(0,0,0,.9)}
@@ -57,6 +57,17 @@
     footer{padding-top:3px;color:#646e7d;font-size:.84rem}
     body.alarming .clock-screen{animation:pulse .8s infinite alternate}
     @keyframes pulse{from{opacity:1}to{opacity:.48}}
+
+    .alarm-summary{margin-top:clamp(.8rem,2vh,1.5rem);font-size:clamp(.82rem,2.3vw,1.1rem);font-weight:520;letter-spacing:.035em;color:rgba(var(--blue),calc(var(--clock-alpha)*.72));font-variant-numeric:tabular-nums}
+    .alarm-settings{display:grid;gap:16px}
+    .alarm-time-row{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+    .alarm-time-label{font-size:1.04rem;font-weight:570}
+    #systemAlarmTime{width:100%;min-height:56px;padding:0 16px;border:1px solid rgba(148,163,184,.24);border-radius:12px;background:#0d121a;color:#f5f7fb;font-size:1.15rem;font-weight:620;color-scheme:dark}
+    .system-alarm-button,.fallback-alarm-button{width:100%;min-height:54px;border:1px solid rgba(132,174,255,.24);border-radius:12px;background:#18202d;color:rgba(var(--blue),.9);font-weight:680;cursor:pointer;touch-action:manipulation}
+    .system-alarm-button:active,.fallback-alarm-button:active{background:#202b3c}
+    .alarm-message{min-height:1.45em;margin:0;color:#9aa5b6;font-size:.92rem;line-height:1.45}
+    .alarm-message.success{color:#9eb8e8}.alarm-message.error{color:#d59696}.alarm-message.warning{color:#c9b27a}
+    .alarm-note{margin:0;color:#697486;font-size:.82rem;line-height:1.45}
     @media (orientation:landscape){.clock{font-size:min(48vh,31vw)}.seconds{font-size:min(11vh,7vw);margin-top:2vh}.panel{width:min(660px,78vw)}}
     @media (max-width:520px){.panel{padding:21px 21px 18px}.alarm-row{align-items:flex-end}}
   </style>
@@ -66,6 +77,7 @@
     <section class="clock-screen" aria-label="Ur">
       <div id="clock" class="clock">--:--</div>
       <div id="seconds" class="seconds" hidden>--</div>
+      <div id="alarmSummary" class="alarm-summary" hidden>Alarm: 07:00</div>
     </section>
 
     <button id="settingsButton" class="settings-button" type="button" aria-label="Åbn indstillinger">
@@ -99,17 +111,26 @@
         </section>
 
         <section class="section">
-          <h2>Alarm</h2>
-          <div class="alarm-row">
-            <input id="alarmTime" type="time" value="07:00" aria-label="Alarmtid">
-            <label class="toggle-row alarm-toggle"><span>Aktiv</span><input id="alarmEnabled" type="checkbox"><span class="toggle-ui" aria-hidden="true"></span></label>
+          <h2>Telefonalarm</h2>
+          <div class="alarm-settings">
+            <div class="alarm-time-row">
+              <label class="alarm-time-label" for="systemAlarmTime">Alarmtidspunkt</label>
+              <input id="systemAlarmTime" type="time" value="07:00" inputmode="none">
+            </div>
+
+            <label class="toggle-row">
+              <span>Vis alarmtid under uret</span>
+              <input id="showAlarmSummary" type="checkbox" checked>
+              <span class="toggle-ui" aria-hidden="true"></span>
+            </label>
+
+            <button id="setSystemAlarm" class="system-alarm-button" type="button">Sæt telefonens alarm</button>
+            <button id="openAlarmApp" class="fallback-alarm-button" type="button" hidden>Åbn alarm-appen</button>
+            <p id="alarmMessage" class="alarm-message" role="status" aria-live="polite"></p>
+            <p class="alarm-note">Tidspunktet her er kun det senest valgte. PWA’en kan ikke kontrollere, om alarmen faktisk er aktiv i Android.</p>
           </div>
-          <div class="label-row volume-label"><label for="alarmVolume">Lydstyrke</label><output id="alarmVolumeValue">60 %</output></div>
-          <input id="alarmVolume" type="range" min="5" max="100" value="60">
-          <button id="testAlarm" class="action-button" type="button">▶&nbsp;&nbsp; Test alarm</button>
-          <button id="stopAlarm" class="action-button stop" type="button" hidden>Stop alarm</button>
         </section>
-        <footer>Version 4.0.1</footer>
+        <footer>Version 5.0.0</footer>
       </div>
     </section>
   </main>
@@ -117,29 +138,242 @@
   <script>
   (()=>{
     'use strict';
-    const VERSION='4.0.0';
-    const $=id=>document.getElementById(id);
-    const el={clock:$('clock'),seconds:$('seconds'),settingsButton:$('settingsButton'),overlay:$('settingsOverlay'),closeSettings:$('closeSettings'),brightness:$('brightness'),brightnessValue:$('brightnessValue'),clockSize:$('clockSize'),clockSizeValue:$('clockSizeValue'),showSeconds:$('showSeconds'),wakeDot:$('wakeDot'),wakeText:$('wakeText'),alarmTime:$('alarmTime'),alarmEnabled:$('alarmEnabled'),alarmVolume:$('alarmVolume'),alarmVolumeValue:$('alarmVolumeValue'),testAlarm:$('testAlarm'),stopAlarm:$('stopAlarm')};
-    const defaults={brightness:34,clockSize:100,showSeconds:false,alarmTime:'07:00',alarmEnabled:false,alarmVolume:60};
-    let wakeLock=null,wakeRetry=null,audioContext=null,oscillator=null,gainNode=null,toneTimer=null,lastAlarmKey='',reloading=false;
 
-    function settings(){try{return {...defaults,...JSON.parse(localStorage.getItem('natUrSettings')||'{}')}}catch{return {...defaults}}}
-    function applyClockSize(){const value=Number(el.clockSize.value)||defaults.clockSize,scale=value/100,landscape=matchMedia('(orientation: landscape)').matches;el.clock.style.fontSize=landscape?`min(${48*scale}vh,${31*scale}vw)`:`clamp(${5*scale}rem,${31*scale}vw,${23*scale}rem)`;el.clockSizeValue.textContent=`${value} %`}function apply(){const value=Number(el.brightness.value)||defaults.brightness;document.documentElement.style.setProperty('--clock-alpha',String(value/100));el.brightnessValue.textContent=`${value} %`;el.alarmVolumeValue.textContent=`${el.alarmVolume.value} %`;el.seconds.hidden=!el.showSeconds.checked;applyClockSize()}
-    function save(){localStorage.setItem('natUrSettings',JSON.stringify({brightness:Number(el.brightness.value),clockSize:Number(el.clockSize.value),showSeconds:el.showSeconds.checked,alarmTime:el.alarmTime.value||defaults.alarmTime,alarmEnabled:el.alarmEnabled.checked,alarmVolume:Number(el.alarmVolume.value)}));apply()}
-    function load(){const s=settings();el.brightness.value=s.brightness;el.clockSize.value=s.clockSize||defaults.clockSize;el.showSeconds.checked=Boolean(s.showSeconds);el.alarmTime.value=s.alarmTime||defaults.alarmTime;el.alarmEnabled.checked=Boolean(s.alarmEnabled);el.alarmVolume.value=s.alarmVolume;apply()}
-    function tick(){const now=new Date(),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0'),ss=String(now.getSeconds()).padStart(2,'0');el.clock.textContent=`${hh}:${mm}`;el.seconds.textContent=ss;checkAlarm(now,`${hh}:${mm}`)}
+    const VERSION='5.0.0';
+    const $=id=>document.getElementById(id);
+    const el={
+      clock:$('clock'),seconds:$('seconds'),alarmSummary:$('alarmSummary'),
+      settingsButton:$('settingsButton'),overlay:$('settingsOverlay'),closeSettings:$('closeSettings'),
+      brightness:$('brightness'),brightnessValue:$('brightnessValue'),clockSize:$('clockSize'),clockSizeValue:$('clockSizeValue'),
+      showSeconds:$('showSeconds'),wakeDot:$('wakeDot'),wakeText:$('wakeText'),
+      systemAlarmTime:$('systemAlarmTime'),showAlarmSummary:$('showAlarmSummary'),setSystemAlarm:$('setSystemAlarm'),
+      openAlarmApp:$('openAlarmApp'),alarmMessage:$('alarmMessage')
+    };
+
+    const defaults={brightness:34,clockSize:100,showSeconds:false,systemAlarmTime:'07:00',showAlarmSummary:true};
+    let wakeLock=null,wakeRetry=null,reloading=false;
+
+    function readSettings(){
+      try{
+        const stored=JSON.parse(localStorage.getItem('natUrSettings')||'{}');
+        return {...defaults,...stored,systemAlarmTime:stored.systemAlarmTime||stored.alarmTime||defaults.systemAlarmTime};
+      }catch{return {...defaults}}
+    }
+
+    function applyClockSize(){
+      const value=Math.max(60,Math.min(220,Number(el.clockSize.value)||defaults.clockSize));
+      const scale=value/100;
+      const landscape=matchMedia('(orientation: landscape)').matches;
+      el.clock.style.fontSize=landscape?`min(${48*scale}vh,${31*scale}vw)`:`clamp(${5*scale}rem,${31*scale}vw,${23*scale}rem)`;
+      el.clockSizeValue.textContent=`${value} %`;
+    }
+
+    function apply(){
+      const brightness=Math.max(8,Math.min(70,Number(el.brightness.value)||defaults.brightness));
+      document.documentElement.style.setProperty('--clock-alpha',String(brightness/100));
+      el.brightnessValue.textContent=`${brightness} %`;
+      el.seconds.hidden=!el.showSeconds.checked;
+      applyClockSize();
+      updateAlarmSummary();
+    }
+
+    function save(){
+      localStorage.setItem('natUrSettings',JSON.stringify({
+        brightness:Number(el.brightness.value),clockSize:Number(el.clockSize.value),showSeconds:el.showSeconds.checked,
+        systemAlarmTime:el.systemAlarmTime.value||defaults.systemAlarmTime,showAlarmSummary:el.showAlarmSummary.checked
+      }));
+      apply();
+    }
+
+    function load(){
+      const s=readSettings();
+      el.brightness.value=s.brightness;
+      el.clockSize.value=s.clockSize||defaults.clockSize;
+      el.showSeconds.checked=Boolean(s.showSeconds);
+      el.systemAlarmTime.value=s.systemAlarmTime||defaults.systemAlarmTime;
+      el.showAlarmSummary.checked=s.showAlarmSummary!==false;
+      apply();
+    }
+
+    function tick(){
+      const now=new Date();
+      const hh=String(now.getHours()).padStart(2,'0');
+      const mm=String(now.getMinutes()).padStart(2,'0');
+      const ss=String(now.getSeconds()).padStart(2,'0');
+      el.clock.textContent=`${hh}:${mm}`;
+      el.seconds.textContent=ss;
+    }
+
+    function updateAlarmSummary(){
+      const time=el.systemAlarmTime.value||defaults.systemAlarmTime;
+      el.alarmSummary.textContent=`Alarm: ${time}`;
+      el.alarmSummary.hidden=!el.showAlarmSummary.checked;
+    }
+
     function wakeStatus(state,text){el.wakeDot.className=`status-dot ${state}`;el.wakeText.textContent=text}
-    async function requestWakeLock(){clearTimeout(wakeRetry);if(!('wakeLock'in navigator)){wakeStatus('error','Wake Lock understøttes ikke');return}if(document.visibilityState!=='visible'){wakeStatus('waiting','Venter på at appen bliver aktiv');return}if(wakeLock&&!wakeLock.released){wakeStatus('active','Skærmen holdes vågen');return}wakeStatus('waiting','Aktiverer Wake Lock…');try{wakeLock=await navigator.wakeLock.request('screen');wakeStatus('active','Skærmen holdes vågen');wakeLock.addEventListener('release',()=>{wakeLock=null;if(document.visibilityState==='visible'){wakeStatus('waiting','Genaktiverer Wake Lock…');wakeRetry=setTimeout(requestWakeLock,800)}},{once:true})}catch{wakeStatus('error','Wake Lock kunne ikke aktiveres');wakeRetry=setTimeout(requestWakeLock,3000)}}
-    function checkAlarm(now,current){if(!el.alarmEnabled.checked||!el.alarmTime.value||document.body.classList.contains('alarming'))return;const key=`${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${current}`;if(current===el.alarmTime.value&&key!==lastAlarmKey){lastAlarmKey=key;startAlarm()}}
-    async function startAlarm(){stopAlarm();const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;try{audioContext=new AC();await audioContext.resume();oscillator=audioContext.createOscillator();gainNode=audioContext.createGain();oscillator.type='sine';oscillator.frequency.value=760;gainNode.gain.value=(Number(el.alarmVolume.value)/100)*.24;oscillator.connect(gainNode);gainNode.connect(audioContext.destination);oscillator.start();let high=false;toneTimer=setInterval(()=>{high=!high;if(oscillator&&audioContext)oscillator.frequency.setValueAtTime(high?940:760,audioContext.currentTime)},480);document.body.classList.add('alarming');el.stopAlarm.hidden=false;if(navigator.vibrate)navigator.vibrate([500,250,500,250,900])}catch{stopAlarm()}}
-    function stopAlarm(){if(toneTimer)clearInterval(toneTimer);toneTimer=null;try{oscillator?.stop()}catch{}try{audioContext?.close()}catch{}oscillator=gainNode=audioContext=null;document.body.classList.remove('alarming');el.stopAlarm.hidden=true;if(navigator.vibrate)navigator.vibrate(0)}
+
+    async function requestWakeLock(){
+      clearTimeout(wakeRetry);
+      if(!('wakeLock' in navigator)){wakeStatus('error','Wake Lock understøttes ikke');return}
+      if(document.visibilityState!=='visible'){wakeStatus('waiting','Venter på at appen bliver aktiv');return}
+      if(wakeLock&&!wakeLock.released){wakeStatus('active','Skærmen holdes vågen');return}
+      wakeStatus('waiting','Aktiverer Wake Lock…');
+      try{
+        wakeLock=await navigator.wakeLock.request('screen');
+        wakeStatus('active','Skærmen holdes vågen');
+        wakeLock.addEventListener('release',()=>{
+          wakeLock=null;
+          if(document.visibilityState==='visible'){
+            wakeStatus('waiting','Genaktiverer Wake Lock…');
+            wakeRetry=setTimeout(requestWakeLock,800);
+          }
+        },{once:true});
+      }catch{
+        wakeStatus('error','Wake Lock kunne ikke aktiveres');
+        wakeRetry=setTimeout(requestWakeLock,3000);
+      }
+    }
+
+    function isAndroid(){
+      if(navigator.userAgentData?.platform)return navigator.userAgentData.platform.toLowerCase()==='android';
+      return /Android/i.test(navigator.userAgent||'');
+    }
+
+    function setAlarmMessage(text,type=''){
+      el.alarmMessage.textContent=text;
+      el.alarmMessage.className=`alarm-message${type?` ${type}`:''}`;
+    }
+
+    function fallbackUrl(reason){
+      const url=new URL(location.href);
+      url.searchParams.set('alarmFallback',reason);
+      return url.href;
+    }
+
+    function buildSetAlarmIntent(hour,minutes){
+      const fallback=encodeURIComponent(fallbackUrl('set'));
+      return `intent:#Intent;action=android.intent.action.SET_ALARM;i.android.intent.extra.alarm.HOUR=${hour};i.android.intent.extra.alarm.MINUTES=${minutes};S.android.intent.extra.alarm.MESSAGE=${encodeURIComponent('Natbord')};B.android.intent.extra.alarm.SKIP_UI=false;S.browser_fallback_url=${fallback};end`;
+    }
+
+    function buildShowAlarmsIntent(){
+      const fallback=encodeURIComponent(fallbackUrl('show'));
+      return `intent:#Intent;action=android.intent.action.SHOW_ALARMS;S.browser_fallback_url=${fallback};end`;
+    }
+
+    function launchIntent(uri){
+      const anchor=document.createElement('a');
+      anchor.href=uri;
+      anchor.style.display='none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+
+    function setPhoneAlarm(){
+      save();
+      el.openAlarmApp.hidden=true;
+
+      if(!isAndroid()){
+        setAlarmMessage('Systemalarm-integrationen kræver Android. Åbn enhedens alarm-app manuelt.','warning');
+        return;
+      }
+
+      const value=el.systemAlarmTime.value;
+      if(!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value)){
+        setAlarmMessage('Vælg et gyldigt alarmtidspunkt først.','error');
+        return;
+      }
+
+      const [hour,minutes]=value.split(':').map(Number);
+      localStorage.setItem('natUrAlarmIntentPending',JSON.stringify({time:value,at:Date.now()}));
+      setAlarmMessage('Alarm-appen åbnes. Kontrollér, at alarmen er gemt.','success');
+
+      try{launchIntent(buildSetAlarmIntent(hour,minutes))}
+      catch{
+        el.openAlarmApp.hidden=false;
+        setAlarmMessage('Kunne ikke sende alarmen. Prøv at åbne alarm-appen nedenfor.','error');
+      }
+    }
+
+    function openPhoneAlarmApp(){
+      if(!isAndroid()){
+        setAlarmMessage('Alarm-appen skal åbnes manuelt på denne enhed.','warning');
+        return;
+      }
+      setAlarmMessage('Alarm-appen åbnes. Opret alarmen manuelt, hvis tidspunktet ikke er udfyldt.','success');
+      try{launchIntent(buildShowAlarmsIntent())}
+      catch{setAlarmMessage('Alarm-appen kunne ikke åbnes. Åbn den manuelt på telefonen.','error')}
+    }
+
+    function handleAlarmFallback(){
+      const url=new URL(location.href);
+      const reason=url.searchParams.get('alarmFallback');
+      if(!reason)return;
+      url.searchParams.delete('alarmFallback');
+      history.replaceState(null,'',url.pathname+url.search+url.hash);
+      el.overlay.hidden=false;
+      el.openAlarmApp.hidden=false;
+      if(reason==='show')setAlarmMessage('Android kunne ikke åbne alarm-appen herfra. Åbn den manuelt.','error');
+      else setAlarmMessage('Telefonen accepterede ikke alarm-intentet. Prøv knappen “Åbn alarm-appen”.','error');
+    }
+
     function openMenu(){el.overlay.hidden=false;el.closeSettings.focus();requestWakeLock()}
     function closeMenu(){el.overlay.hidden=true;el.settingsButton.focus()}
-    async function enterFullscreen(){if(document.fullscreenElement||!document.documentElement.requestFullscreen)return;try{await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch{}}
-    function bind(){[el.brightness,el.clockSize,el.showSeconds,el.alarmTime,el.alarmEnabled,el.alarmVolume].forEach(node=>{node.addEventListener('input',save);node.addEventListener('change',save)});el.settingsButton.addEventListener('click',()=>{openMenu();enterFullscreen()});el.closeSettings.addEventListener('click',closeMenu);el.overlay.addEventListener('click',e=>{if(e.target===el.overlay)closeMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!el.overlay.hidden)closeMenu()});el.testAlarm.addEventListener('click',startAlarm);el.stopAlarm.addEventListener('click',stopAlarm);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){tick();requestWakeLock();checkUpdates()}});document.addEventListener('pointerdown',requestWakeLock,{passive:true});window.addEventListener('resize',applyClockSize)}
-    async function checkUpdates(){if(!('serviceWorker'in navigator))return;try{const r=await navigator.serviceWorker.getRegistration();await r?.update()}catch{}}
-    function installSW(){if(!('serviceWorker'in navigator))return;window.addEventListener('load',async()=>{try{const r=await navigator.serviceWorker.register('./sw.js?v=4.0.1',{updateViaCache:'none'});r.addEventListener('updatefound',()=>{const w=r.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'})})});navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});setInterval(checkUpdates,30*60*1000)}catch{}})}
-    load();tick();bind();requestWakeLock();installSW();setInterval(tick,1000);
+
+    async function enterFullscreen(){
+      if(document.fullscreenElement||!document.documentElement.requestFullscreen)return;
+      try{await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch{}
+    }
+
+    function bind(){
+      [el.brightness,el.clockSize,el.showSeconds,el.systemAlarmTime,el.showAlarmSummary].forEach(node=>{
+        node.addEventListener('input',save);node.addEventListener('change',save);
+      });
+      el.settingsButton.addEventListener('click',()=>{openMenu();enterFullscreen()});
+      el.closeSettings.addEventListener('click',closeMenu);
+      el.overlay.addEventListener('click',e=>{if(e.target===el.overlay)closeMenu()});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!el.overlay.hidden)closeMenu()});
+      el.setSystemAlarm.addEventListener('click',setPhoneAlarm);
+      el.openAlarmApp.addEventListener('click',openPhoneAlarmApp);
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState==='visible'){
+          tick();requestWakeLock();checkUpdates();
+          const pending=localStorage.getItem('natUrAlarmIntentPending');
+          if(pending){
+            localStorage.removeItem('natUrAlarmIntentPending');
+            setAlarmMessage('Tilbage fra alarm-appen. Kontrollér, at alarmen “Natbord” er gemt.','success');
+          }
+        }
+      });
+      document.addEventListener('pointerdown',requestWakeLock,{passive:true});
+      window.addEventListener('resize',applyClockSize);
+    }
+
+    async function checkUpdates(){
+      if(!('serviceWorker' in navigator))return;
+      try{const r=await navigator.serviceWorker.getRegistration();await r?.update()}catch{}
+    }
+
+    function installSW(){
+      if(!('serviceWorker' in navigator))return;
+      window.addEventListener('load',async()=>{
+        try{
+          const r=await navigator.serviceWorker.register('./sw.js?v=5.0.0',{updateViaCache:'none'});
+          r.addEventListener('updatefound',()=>{
+            const w=r.installing;if(!w)return;
+            w.addEventListener('statechange',()=>{
+              if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'});
+            });
+          });
+          navigator.serviceWorker.addEventListener('controllerchange',()=>{
+            if(reloading)return;reloading=true;location.reload();
+          });
+          setInterval(checkUpdates,30*60*1000);
+        }catch{}
+      });
+    }
+
+    load();tick();bind();requestWakeLock();handleAlarmFallback();installSW();setInterval(tick,1000);
   })();
   </script>
 </body>
