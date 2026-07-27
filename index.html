@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <title>Nat-ur</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=3.0.1">
-  <link rel="icon" href="./icons/icon.svg?v=3.0.1" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=3.0.1">
+  <link rel="manifest" href="./manifest.webmanifest?v=3.0.2">
+  <link rel="icon" href="./icons/icon.svg?v=3.0.2" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=3.0.2">
 </head>
 <body>
   <main class="app">
@@ -19,7 +19,11 @@
       <div id="seconds" class="seconds" hidden>--</div>
     </section>
 
-    <button id="settingsButton" class="settings-button" type="button" aria-label="Åbn indstillinger">⚙</button>
+    <button id="settingsButton" class="settings-button" type="button" aria-label="Åbn indstillinger">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.1 7.1 0 0 0-1.62-.94l-.36-2.54a.49.49 0 0 0-.49-.42h-3.84a.5.5 0 0 0-.49.42L9.2 5.32c-.58.24-1.12.55-1.62.93l-2.39-.95a.5.5 0 0 0-.61.22L2.66 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.05.31-.08.65-.08.96 0 .3.03.61.08.92L2.78 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.13.23.4.32.61.22l2.39-.96c.5.39 1.04.7 1.62.94l.36 2.54c.04.24.24.42.49.42h3.84c.25 0 .45-.18.49-.42l.36-2.54a7.1 7.1 0 0 0 1.62-.94l2.39.96c.22.08.48 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.02-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/>
+      </svg>
+    </button>
 
     <section id="settingsOverlay" class="overlay" hidden>
       <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
@@ -73,11 +77,11 @@
           <button id="stopAlarm" class="action-button stop" type="button" hidden>Stop alarm</button>
         </section>
 
-        <footer>Version 3.0.1</footer>
+        <footer>Version 3.0.2</footer>
       </div>
     </section>
   </main>
 
-  <script src="./app.js?v=3.0.1"></script>
+  <script src="./app.js?v=3.0.2"></script>
 </body>
 </html>

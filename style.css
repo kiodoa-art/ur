@@ -7,8 +7,8 @@ button,input{font:inherit}
 .clock-screen{width:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:rgba(var(--blue),var(--clock-alpha));text-align:center}
 .clock{font-size:clamp(7rem,31vw,23rem);line-height:.82;font-weight:480;letter-spacing:-.065em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .seconds{margin-top:clamp(1rem,3vh,2.5rem);font-size:clamp(2rem,8vw,5.5rem);font-weight:460;color:rgba(var(--blue),calc(var(--clock-alpha)*.86));font-variant-numeric:tabular-nums}
-.settings-button{position:fixed;z-index:10;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));width:54px;height:54px;padding:0;border:0;background:transparent;color:rgb(var(--blue));opacity:.27;font-size:38px;line-height:54px;text-align:center;cursor:pointer}
-.settings-button:active{opacity:.55}
+.settings-button{position:fixed;z-index:20;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));width:58px;height:58px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(132,174,255,.035);color:rgb(var(--blue));opacity:.42;cursor:pointer}
+.settings-button:active{opacity:.75;background:rgba(132,174,255,.08)}
 .overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:14px;background:rgba(0,0,0,.86)}
 .overlay[hidden]{display:none}
 .panel{width:min(620px,100%);max-height:calc(100dvh - 28px);overflow:auto;padding:26px 28px 22px;border:1px solid rgba(148,163,184,.24);border-radius:24px;background:#0b0f15;box-shadow:0 24px 80px rgba(0,0,0,.75)}
@@ -43,3 +43,5 @@ body.alarming .clock-screen{animation:pulse .8s infinite alternate}
 @keyframes pulse{from{opacity:1}to{opacity:.48}}
 @media (orientation:landscape){.clock{font-size:min(48vh,31vw)}.seconds{font-size:min(11vh,7vw);margin-top:2vh}.panel{width:min(660px,78vw)}}
 @media (max-width:520px){.panel{padding:21px 21px 18px}.alarm-row{align-items:flex-end}}
+
+.settings-button svg{display:block;width:34px;height:34px;fill:currentColor;pointer-events:none}

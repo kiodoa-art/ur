@@ -1,4 +1,4 @@
-const VERSION = "3.0.1";
+const VERSION = "3.0.2";
 const CACHE = `nat-ur-${VERSION}`;
 const OFFLINE = "./index.html";
 
@@ -6,10 +6,10 @@ self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll([
       "./index.html",
-      "./style.css?v=3.0.1",
-      "./app.js?v=3.0.1",
-      "./manifest.webmanifest?v=3.0.1",
-      "./icons/icon.svg?v=3.0.1"
+      "./style.css?v=3.0.2",
+      "./app.js?v=3.0.2",
+      "./manifest.webmanifest?v=3.0.2",
+      "./icons/icon.svg?v=3.0.2"
     ]))
   );
   self.skipWaiting();

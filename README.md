@@ -1,11 +1,7 @@
-# Nat-ur PWA 3.0.1
+# Nat-ur PWA 3.0.2
 
-Denne version retter cache-fejlen i 3.0.0, hvor HTML, CSS og JavaScript kunne komme fra forskellige versioner.
+Retter tandhjulet, som ikke blev vist korrekt på nogle Android-telefoner.
 
-## Upload
-Upload alle filerne i zip-filen til roden af GitHub-repositoriet og overskriv de gamle filer.
+Tandhjulet er nu et indbygget SVG-ikon og er derfor uafhængigt af telefonens skrifttype.
 
-## Efter upload
-Åbn den installerede PWA. Den bør opdatere automatisk. Hvis 3.0.0 stadig vises, luk appen helt og åbn den igen. Som sidste udvej kan PWA'en afinstalleres og installeres igen.
-
-Uret bruger telefonens systemtid og virker derfor uden internet.
+Upload alle filer til roden af GitHub-repositoriet og overskriv de gamle.
