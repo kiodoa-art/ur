@@ -1,4 +1,4 @@
-const VERSION='4.0.0';
+const VERSION='4.0.1';
 const CACHE=`nat-ur-${VERSION}`;
 const SHELL='./index.html';
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.add(SHELL)));self.skipWaiting()});
